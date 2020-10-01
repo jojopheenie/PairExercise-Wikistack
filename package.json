@@ -1,7 +1,6 @@
 {
   "name": "wikistack",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -18,5 +17,14 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikylaz/PairExercise-Wikistack.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mikylaz/PairExercise-Wikistack/issues"
+  },
+  "homepage": "https://github.com/mikylaz/PairExercise-Wikistack#readme",
+  "description": ""
 }

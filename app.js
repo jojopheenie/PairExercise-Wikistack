@@ -1,39 +1,21 @@
 const express = require("express");
-const morgan = require("morgan");
-const bodyParser = require("body-parser");
-const layout = require("./views/layout.js")
 const app = express();
-const { db, Page, User } = require('./models');
-db.authenticate()
-  .then(() => {
-    console.log('connected to the database');
-  })
-const wikiRouter = require('./routes/wiki');
-const userRouter = require('./routes/users');
+const morgan = require("morgan");
+const path = require("path");
 
-app.use(morgan("dev"));
-app.use(express.static(__dirname + "/public"));
-app.use(bodyParser.urlencoded({extended: false}))
-
-app.use('/wiki', wikiRouter);
-app.use('/users', userRouter);
+app.use(morgan("dev")); //logging middleware
+app.use(express.static(path.join(__dirname, "./public"))); //serving up static files (e.g. css files)
+app.use(express.urlencoded({ extended: false })); //parsing middleware for form input data
+app.use(express.json());
+app.use(require('method-override')('_method'));
 
 
 
-app.get("/", (req, res) => {
-  res.redirect('/wiki')
-})
+app.use("/wiki", require("./routes/wiki"));
+app.use("/users", require("./routes/users"));
 
-const PORT = 3000;
+app.get("/", function (req, res) {
+  res.redirect("/wiki/");
+});
 
-const init = async () => {
-  await Page.sync({force: true});
-  await User.sync({force: true});
-  app.listen(PORT, () => {
-    console.log(`App listening in port ${PORT}`);
-  });
-}
-
-init();
-
-
+module.exports = app;

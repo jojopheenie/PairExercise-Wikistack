@@ -1,4 +1,5 @@
 const Sequelize = require("sequelize");
+const {Op} = require("sequelize");
 
 const db = new Sequelize("postgres://localhost:5432/wikistack", {
   logging: false
@@ -21,10 +22,21 @@ const Page = db.define("page", {
   },
   status: {
     type: Sequelize.ENUM("open", "closed")
+  },
+  tags: {
+    type: Sequelize.ARRAY(Sequelize.STRING),
+    defaultValue: []
   }
 });
 
 Page.beforeValidate((page) => {
+  /*
+   * make sure tags are an array
+   */
+  if (typeof page.tags === "string") {
+    page.tags = page.tags.split(",").map((str) => str.trim());
+  }
+
   /*
    * Generate slug
    */
@@ -32,6 +44,23 @@ Page.beforeValidate((page) => {
     page.slug = page.title.replace(/\s/g, "_").replace(/\W/g, "").toLowerCase();
   }
 });
+
+Page.findByTag = function (tag) {
+  return this.findAll({
+    where: {
+      tags: { [Op.contains]: [tag] }
+    }
+  });
+};
+
+Page.prototype.findSimilar = function () {
+  return Page.findAll({
+    where: {
+      id: { [Op.ne]: this.id },
+      tags: { [Op.overlap]: this.tags }
+    }
+  });
+};
 
 const User = db.define("user", {
   name: {
